@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import * as fs from "fs";
+import { TEMPLATE } from "./TEMPLATE";
 
 export async function scaffoldSearchDefinition() {
   const fileOptions = {
@@ -24,7 +26,6 @@ export async function scaffoldSearchDefinition() {
     case fileOptions.temporary:
       fileToUse = await vscode.workspace.openTextDocument({
         language: "typescript",
-        content: "SCAFFOLD",
       });
       break;
     case fileOptions.newFile:
@@ -69,6 +70,21 @@ export async function scaffoldSearchDefinition() {
       );
       return;
   }
+
+  await vscode.languages.setTextDocumentLanguage(fileToUse, "typescript");
+  const textEditor = await vscode.window.showTextDocument(fileToUse);
+  textEditor.edit((edit) => {
+    const firstLine = textEditor.document.lineAt(0);
+    const lastLine = textEditor.document.lineAt(
+      textEditor.document.lineCount - 1
+    );
+    const fullRange = new vscode.Range(
+      firstLine.range.start,
+      lastLine.range.end
+    );
+    edit.delete(fullRange);
+    edit.insert(textEditor.document.lineAt(0).range.start, TEMPLATE);
+  });
 }
 
 async function chooseWorkspaceFolder(

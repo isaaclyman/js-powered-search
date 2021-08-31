@@ -4,6 +4,8 @@ JS Powered Search (JSPS) is a simple engine for searching a project using the fu
 
 JSPS scaffolds a self-contained search definition file which you can alter to your needs, using JavaScript's robust string logic to determine whether each file or line of code matches your search and returning `true` or `false`. You can save useful search files in your repo, making it easy to run them from the Command Palette later. If you commit your searches to version control, the whole team can use them just as easily.
 
+Contribute here: https://github.com/isaaclyman/js-powered-search
+
 ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
