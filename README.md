@@ -1,6 +1,8 @@
-# js-powered-search README
+# JS Powered Search
 
-This is the README for your extension "js-powered-search". After writing up a brief description, we recommend including the following sections.
+JS Powered Search (JSPS) is a simple engine for searching a project using the full power of JavaScript/TypeScript. It's more powerful than RegEx and _way_ more powerful than a text search, although it has the ability to do both. Any conditional logic you can do with code, you can also do with JSPS -- search depth, complexity, and performance are all up to you.
+
+JSPS scaffolds a self-contained search definition file which you can alter to your needs, using JavaScript's robust string logic to determine whether each file or line of code matches your search and returning `true` or `false`. You can save useful search files in your repo, making it easy to run them from the Command Palette later. If you commit your searches to version control, the whole team can use them just as easily.
 
 ## Features
 
@@ -24,8 +26,8 @@ For example:
 
 This extension contributes the following settings:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+- `myExtension.enable`: enable/disable this extension
+- `myExtension.thing`: set to `blah` to do something
 
 ## Known Issues
 
@@ -47,24 +49,25 @@ Fixed issue #.
 
 Added features X, Y, and Z.
 
------------------------------------------------------------------------------------------------------------
+---
+
 ## Following extension guidelines
 
 Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
 
 ## Working with Markdown
 
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+**Note:** You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
+- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
+- Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
+- Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
 
 ### For more information
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
+- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
 **Enjoy!**

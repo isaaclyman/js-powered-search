@@ -1,25 +1,37 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import { scaffoldSearchDefinition } from "./commands/scaffold";
+import { executeSearch } from "./commands/search";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-	
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "js-powered-search" is now active!');
+  context.subscriptions.push(
+    // SCAFFOLD
+    // Creates a search definition file using the active text editor
+    // Overwrites the file currently being viewed
+    vscode.commands.registerCommand("js-powered-search.scaffold", async () => {
+      try {
+        await scaffoldSearchDefinition();
+      } catch (e) {
+        vscode.window.showErrorMessage("Uncaught error in scaffold command.");
+        console.error(e);
+      }
+    }),
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('js-powered-search.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from JS Powered Search!');
-	});
-
-	context.subscriptions.push(disposable);
+    // SEARCH
+    // Validates the active text editor, then uses it as a search definition
+    // Opens a new window with all search results
+    vscode.commands.registerCommand("js-powered-search.search", async () => {
+      try {
+        await executeSearch();
+      } catch (e) {
+        vscode.window.showErrorMessage("Uncaught error in search command.");
+        console.error(e);
+      }
+    })
+  );
 }
 
 // this method is called when your extension is deactivated

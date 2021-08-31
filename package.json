@@ -3,21 +3,36 @@
   "displayName": "JS Powered Search",
   "description": "Use the power of JavaScript or TypeScript to search your project",
   "version": "0.0.1",
+  "publisher": "Isaac Lyman",
   "engines": {
-    "vscode": "^1.59.0"
+    "vscode": "^1.57.0"
   },
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "search",
+    "programmatic",
+    "project-wide",
+    "universal"
+  ],
+  "preview": true,
   "activationEvents": [
-    "onCommand:js-powered-search.helloWorld"
+    "onCommand:js-powered-search.scaffold",
+    "onCommand:js-powered-search.search"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "js-powered-search.helloWorld",
-        "title": "Hello World"
+        "command": "js-powered-search.scaffold",
+        "title": "Scaffold a search definition file",
+        "category": "JS Powered Search"
+      },
+      {
+        "command": "js-powered-search.search",
+        "title": "Search using this definition file",
+        "category": "JS Powered Search"
       }
     ]
   },
