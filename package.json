@@ -2,8 +2,13 @@
   "name": "js-powered-search",
   "displayName": "JS Powered Search",
   "description": "Use the full power of JavaScript to search your project",
+  "icon": "media/jsps.png",
+  "author": {
+    "name": "Isaac Lyman",
+    "url": "https://isaaclyman.com"
+  },
   "version": "0.0.1",
-  "publisher": "Isaac Lyman",
+  "publisher": "isaac-lyman",
   "repository": {
     "type": "git",
     "url": "https://github.com/isaaclyman/js-powered-search"
