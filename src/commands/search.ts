@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import * as ts from "typescript";
+import * as fs from "fs";
 import * as requireFromString from "require-from-string";
 import {
   FileSearchOptions,
@@ -19,7 +20,12 @@ interface SearchDefinition {
   searchByFile: FileSearchOptions;
 }
 
-export function executeSearch() {
+interface FileResult {
+  matchesByFile: boolean;
+  matchesByLine: number[] | undefined;
+}
+
+export async function executeSearch() {
   const activeFile = vscode.window.activeTextEditor;
   if (!activeFile) {
     vscode.window.showErrorMessage("No text editor is active.");
@@ -47,6 +53,143 @@ export function executeSearch() {
   }
 
   const searchDefinition = validateAndGetSearchDefinition(dynamicModule);
+  if (!searchDefinition) {
+    return;
+  }
+
+  const openFolders = vscode.workspace.workspaceFolders;
+  if (!openFolders || !openFolders.length) {
+    vscode.window.showErrorMessage(
+      "Search definition looks good, but no workspace folders are currently open."
+    );
+    return;
+  }
+
+  const includeGlobs = searchDefinition.settings.includeFilePatterns || [];
+  if (!includeGlobs.length) {
+    includeGlobs.push("**/*");
+  }
+
+  const excludeGlobs = searchDefinition.settings.excludeFilePatterns || [];
+
+  const files = await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: "Matching files...",
+      cancellable: true,
+    },
+    (progress, cancelToken) => {
+      return vscode.workspace.findFiles(
+        `{${includeGlobs.join(",")}}`,
+        excludeGlobs.length ? `{${excludeGlobs.join(",")}}` : null,
+        undefined,
+        cancelToken
+      );
+    }
+  );
+
+  if (!files.length) {
+    vscode.window.showErrorMessage(
+      "No files matched the provided file patterns. Check your settings."
+    );
+  }
+
+  if (files.length > 200) {
+    const confirm = await vscode.window.showWarningMessage(
+      `The provided patterns matched ${files.length} files. Are you sure you want to continue with the search?`,
+      "Cancel",
+      "Search"
+    );
+    if (confirm !== "Search") {
+      return;
+    }
+  }
+
+  const maxFileSizeInKB =
+    typeof searchDefinition.settings.maxFileSizeInKB === "number"
+      ? searchDefinition.settings.maxFileSizeInKB
+      : 1000;
+  const fileMatcher = searchDefinition.searchByFile.doesFileMatchSearch;
+  const lineMatcher = searchDefinition.searchByLine.doesLineMatchSearch;
+
+  const matches = await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: "Searching with the full power of JavaScript...",
+      cancellable: true,
+    },
+    (progress, cancelToken) => {
+      const progressStepSize = Math.floor(files.length / 25) || 1;
+      let completedFiles = 0;
+      const incrementCompletedFiles = () => {
+        completedFiles++;
+
+        if (completedFiles % progressStepSize === 0) {
+          progress.report({ increment: (completedFiles / files.length) * 100 });
+        }
+      };
+
+      const promiseList: Promise<FileResult>[] = [];
+      for (let fileIx = 0; fileIx < files.length; fileIx++) {
+        const filePromise = new Promise<FileResult>(async (resolve, reject) => {
+          if (cancelToken.isCancellationRequested) {
+            return Promise.resolve(undefined);
+          }
+
+          const file = files[fileIx];
+          const stat = await vscode.workspace.fs.stat(file);
+          if (maxFileSizeInKB && stat.size / 1000 > maxFileSizeInKB) {
+            resolve({
+              matchesByFile: false,
+              matchesByLine: undefined,
+            });
+            return;
+          }
+
+          const contentBuffer = await vscode.workspace.fs.readFile(file);
+          const contentString = Buffer.from(contentBuffer).toString("utf8");
+          const contentLines = contentString.includes("\r\n")
+            ? contentString.split("\r\n")
+            : contentString.split("\n");
+          const fileMetadata = {
+            filePath: file.path,
+            fileName: file.path.slice(file.path.lastIndexOf("/") + 1),
+          };
+
+          let matchesByLine = undefined;
+          if (lineMatcher) {
+            matchesByLine = [];
+            for (let lineIx = 0; lineIx < contentLines.length; lineIx++) {
+              const line = contentLines[lineIx];
+              if (lineMatcher(line, fileMetadata)) {
+                matchesByLine.push(lineIx);
+              }
+            }
+          }
+
+          resolve({
+            matchesByFile: !fileMatcher
+              ? false
+              : fileMatcher(contentLines, fileMetadata),
+            matchesByLine,
+          });
+        });
+        promiseList.push(filePromise);
+      }
+
+      return Promise.all(promiseList);
+    }
+  );
+
+  if (!matches) {
+    return;
+  }
+
+  const filteredMatches = matches.filter(
+    (m) => m.matchesByFile || (m.matchesByLine && m.matchesByLine.length)
+  );
+  console.log(`Found ${filteredMatches.length} matching files.`);
+  console.log(filteredMatches);
 }
 
 function tryTranspileFile(

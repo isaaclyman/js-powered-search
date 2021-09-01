@@ -30,7 +30,9 @@ export async function scaffoldSearchDefinition() {
     case fileOptions.newFile:
       const openFolders = vscode.workspace.workspaceFolders;
       if (!openFolders || !openFolders.length) {
-        vscode.window.showErrorMessage("No folders are currently open.");
+        vscode.window.showErrorMessage(
+          "No workspace folders are currently open."
+        );
         return;
       }
 
