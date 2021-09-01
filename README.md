@@ -1,8 +1,10 @@
 # JS Powered Search
 
-JS Powered Search (JSPS) is a simple engine for searching a project using the full power of JavaScript/TypeScript. It's more powerful than RegEx and _way_ more powerful than a text search, although it has the ability to do both. Any conditional logic you can do with code, you can also do with JSPS -- search depth, complexity, and performance are all up to you.
+Suppose you're working in a large codebase and for personal reasons you need to find every file with a `.ts` extension that imports `urlUtilityClass`, uses the `urlJoin` method of that class two or more times, uses the `protocolReplace` method of that class _exactly three times_, and _never_ uses the `validateUrl` method of that class. (It's okay, we're all working with legacy code here.) Feel a RegEx headache coming on?
 
-JSPS scaffolds a self-contained search definition file which you can alter to your needs, using JavaScript's robust string logic to determine whether each file or line of code matches your search and returning `true` or `false`. You can save useful search files in your repo, making it easy to run them from the Command Palette later. If you commit your searches to version control, the whole team can use them just as easily.
+JS Powered Search (JSPS) is a simple engine for searching a project using the full power of JavaScript. It's more powerful than RegEx and _way_ more powerful than a text search, although it has the ability to do both. Any conditional logic you can do with code, you can also do with JSPS -- search depth, complexity, and performance are all up to you.
+
+JSPS scaffolds a self-contained search definition file which you can alter to your needs by writing code to determine whether each file or line of code matches your search. You can save useful search files to your computer, making it easy to run them from the Command Palette later. If you commit your search files to version control, the whole team can use them just as easily.
 
 Contribute here: https://github.com/isaaclyman/js-powered-search
 
@@ -16,11 +18,7 @@ For example if there is an image subfolder under your extension project workspac
 
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
+<!-- ## Extension Settings
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
@@ -29,47 +27,18 @@ For example:
 This extension contributes the following settings:
 
 - `myExtension.enable`: enable/disable this extension
-- `myExtension.thing`: set to `blah` to do something
+- `myExtension.thing`: set to `blah` to do something -->
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Extension is in preview.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
+Initial release.
 
-Initial release of ...
+## Wishlist
 
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-- Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-- Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+- Allow passing in a fake "test file" or "test line" to the appropriate functions. The contents should pass the test defined by the predicate. Otherwise, you'll receive an error message. This will give a quick understanding of what the test is looking for.
