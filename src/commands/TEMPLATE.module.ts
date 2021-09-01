@@ -1,3 +1,5 @@
+export const TEMPLATE = `
+
 interface SearchOptions {
   includeFilePatterns?: string[]; // globs to include, e.g. ['*.ts']. Searches all files by default.
   excludeFilePatterns?: string[]; // globs to exclude.
@@ -50,3 +52,5 @@ export function searchByFile(): FileSearchOptions {
     },
   };
 }
+
+`.trim();
