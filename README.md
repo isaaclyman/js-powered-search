@@ -16,6 +16,14 @@ Scaffold a powerful Search Definition file instantly:
 
 ![Scaffold search definition](media/demo-scaffold.gif)
 
+Configure search settings and write matchers. In this case, we're looking for TypeScript files that have at least three imports and export a class whose name includes the term "Component".
+
+![Configure search](media/demo-configure.gif)
+
+Run the search whenever you're ready, and results will show up in the JSPS Results pane.
+
+![Execute search](media/demo-search.gif)
+
 ## How to begin
 
 Open the Command Palette with Ctrl + Shift + P. JS Powered Search provides two commands:

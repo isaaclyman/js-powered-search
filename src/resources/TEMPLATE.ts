@@ -29,7 +29,7 @@ export interface LineSearchOptions {
 
 export function searchByLine(): LineSearchOptions {
   return {
-    doesLineMatchSearch: (line) => {
+    doesLineMatchSearch: (line, metadata) => {
       return line.includes("exactly what I'm looking for");
     },
   };
@@ -52,7 +52,7 @@ export interface FileSearchOptions {
 
 export function searchByFile(): FileSearchOptions {
   return {
-    doesFileMatchSearch: (file) => {
+    doesFileMatchSearch: (file, metadata) => {
       return file.includes("another thing I'm looking for");
     },
   };
