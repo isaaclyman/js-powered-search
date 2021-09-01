@@ -1,7 +1,7 @@
 {
   "name": "js-powered-search",
   "displayName": "JS Powered Search",
-  "description": "Use the power of JavaScript or TypeScript to search your project",
+  "description": "Use the full power of JavaScript to search your project",
   "version": "0.0.1",
   "publisher": "Isaac Lyman",
   "engines": {
@@ -23,6 +23,24 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "js-powered-search",
+          "title": "JS Powered Search",
+          "icon": "media/jsps.svg"
+        }
+      ]
+    },
+    "views": {
+      "js-powered-search": [
+        {
+          "id": "js-powered-search-results",
+          "name": "Results",
+          "icon": "media/jsps.svg"
+        }
+      ]
+    },
     "commands": [
       {
         "command": "js-powered-search.scaffold",

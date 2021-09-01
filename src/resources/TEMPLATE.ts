@@ -3,6 +3,7 @@ export interface SearchOptions {
   excludeFilePatterns?: string[]; // globs to exclude.
   includeNodeModules?: boolean; // (default: false) true if node_modules should be searched. Strongly discouraged.
   maxFileSizeInKB?: number; // (default: 1000) any files larger than this will be skipped.
+  onlyTestLinesInMatchingFiles?: boolean; // (default: false) true if searchByLine should only be used on files that pass searchByFile
 }
 
 export function getSettings(): SearchOptions {
@@ -10,11 +11,12 @@ export function getSettings(): SearchOptions {
     // includeFilePatterns: [],
     // excludeFilePatterns: [],
     // includeNodeModules: false,
-    // maxFileSizeInKB: 1000
+    // maxFileSizeInKB: 1000,
+    // onlyTestLinesInMatchingFiles: false
   };
 }
 
-export interface SearchMetadata {
+export interface LineSearchMetadata {
   fileName: string;
   filePath: string;
 }
@@ -22,7 +24,7 @@ export interface SearchMetadata {
 export interface LineSearchOptions {
   // A function that accepts a line of text and determines whether it matches your search.
   // If you only want to search by file, set this method to undefined.
-  doesLineMatchSearch?: (line: string, metadata: SearchMetadata) => boolean;
+  doesLineMatchSearch?: (line: string, metadata: LineSearchMetadata) => boolean;
 }
 
 export function searchByLine(): LineSearchOptions {
@@ -33,21 +35,25 @@ export function searchByLine(): LineSearchOptions {
   };
 }
 
+export interface FileSearchMetadata {
+  fileName: string;
+  filePath: string;
+  lines: string[]; // The file text as an array of lines
+}
+
 export interface FileSearchOptions {
-  // A function that accepts a file (as an array of lines of text) and determines whether the file matches your search.
+  // A function that accepts a file (as a text string) and determines whether the file matches your search.
   // If you only want to search by line, set this method to undefined.
   doesFileMatchSearch?: (
-    fileContents: string[],
-    metadata: SearchMetadata
+    fileContents: string,
+    metadata: FileSearchMetadata
   ) => boolean;
 }
 
 export function searchByFile(): FileSearchOptions {
   return {
-    doesFileMatchSearch: (lines) => {
-      return lines.some((line) =>
-        line.includes("another thing I'm looking for")
-      );
+    doesFileMatchSearch: (file) => {
+      return file.includes("another thing I'm looking for");
     },
   };
 }

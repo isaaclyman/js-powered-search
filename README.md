@@ -2,11 +2,25 @@
 
 Suppose you're working in a large codebase and for personal reasons you need to find every file with a `.ts` extension that imports `urlUtilityClass`, uses the `urlJoin` method of that class two or more times, uses the `protocolReplace` method of that class _exactly three times_, and _never_ uses the `validateUrl` method of that class. (It's okay, we're all working with legacy code here.) Feel a RegEx headache coming on?
 
-JS Powered Search (JSPS) is a simple engine for searching a project using the full power of JavaScript. It's more powerful than RegEx and _way_ more powerful than a text search, although it has the ability to do both. Any conditional logic you can do with code, you can also do with JSPS -- search depth, complexity, and performance are all up to you.
+JS Powered Search (JSPS) is a simple engine for searching a project using the full power of JavaScript. It's more powerful than RegEx and _way_ more powerful than a text search, although it has the ability to do both. Any stateful logic you can write with code, you can use in JSPS -- search depth, complexity, and performance are all up to you.
 
-JSPS scaffolds a self-contained search definition file which you can alter to your needs by writing code to determine whether each file or line of code matches your search. You can save useful search files to your computer, making it easy to run them from the Command Palette later. If you commit your search files to version control, the whole team can use them just as easily.
+JSPS scaffolds a self-contained search definition file which you can alter to your needs by writing code to determine whether each file or line of code matches your search. You can save useful search definitions to your computer, making it easy to run them from the Command Palette later. If you commit your search definitions to version control, the whole team can use them just as easily.
 
 Contribute here: https://github.com/isaaclyman/js-powered-search
+
+## How to begin
+
+Open the Command Palette with Ctrl + Shift + P. JS Powered Search provides two commands:
+
+### Scaffold
+
+This creates a search definition file. JSPS will ask if you want to use a new unsaved editor window, create a new file at the project root, or overwrite the currently active file. Whatever you choose, you'll get a TypeScript file with three exported functions: one that returns general settings for your search, one that returns line matching functionality, and one that returns file matching functionality. TypeScript interfaces for every type you'll be interacting with are fully defined in the file.
+
+From here, defining your search parameters is up to you. You can use multiple globs to include and exclude files by directory, filename, and extension. You can opt out of line matching, file matching, or both. You can write as much or as little logic in each matcher as you want, maintaining state with the provided closures (but keep in mind that files are not searched sequentially or in any particular order).
+
+### Search
+
+This executes a workspace-wide search using the currently active file as a search definition. JSPS will let you know if there's something wrong with your file, and the operation can be cancelled at any point. The JSPS Search Results pane will open to show results as they come in. Click any search result to jump to it in your codebase.
 
 ## Features
 

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { TEMPLATE } from "./TEMPLATE.module";
+import { TEMPLATE } from "../resources/TEMPLATE.module";
 
 export async function scaffoldSearchDefinition() {
   const fileOptions = {
