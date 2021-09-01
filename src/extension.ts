@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
     // SCAFFOLD
     // Creates a search definition file using the active text editor
     // Overwrites the file currently being viewed
-    vscode.commands.registerCommand("js-powered-search.scaffold", async () => {
+    vscode.commands.registerCommand("jsPoweredSearch.scaffold", async () => {
       try {
         await scaffoldSearchDefinition();
       } catch (e) {
@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
     // SEARCH
     // Validates the active text editor, then uses it as a search definition
     // Opens a new window with all search results
-    vscode.commands.registerCommand("js-powered-search.search", async () => {
+    vscode.commands.registerCommand("jsPoweredSearch.search", async () => {
       try {
         await executeSearch();
       } catch (e) {

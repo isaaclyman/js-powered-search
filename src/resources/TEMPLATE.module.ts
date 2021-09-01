@@ -1,7 +1,7 @@
 export const TEMPLATE = `
 
 export interface SearchOptions {
-  includeFilePatterns?: string[]; // globs to include, e.g. ['*.ts']. Searches all files by default.
+  includeFilePatterns?: string[]; // globs to include, e.g. ['**/*.ts']. Searches all files by default.
   excludeFilePatterns?: string[]; // globs to exclude.
   includeNodeModules?: boolean; // (default: false) true if node_modules should be searched. Strongly discouraged.
   maxFileSizeInKB?: number; // (default: 1000) any files larger than this will be skipped.

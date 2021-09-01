@@ -1,5 +1,5 @@
 {
-  "name": "js-powered-search",
+  "name": "jsPoweredSearch",
   "displayName": "JS Powered Search",
   "description": "Use the full power of JavaScript to search your project",
   "version": "0.0.1",
@@ -18,39 +18,69 @@
   ],
   "preview": true,
   "activationEvents": [
-    "onCommand:js-powered-search.scaffold",
-    "onCommand:js-powered-search.search"
+    "onCommand:jsPoweredSearch.scaffold",
+    "onCommand:jsPoweredSearch.search"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "js-powered-search",
+          "id": "jsPoweredSearch",
           "title": "JS Powered Search",
           "icon": "media/jsps.svg"
         }
       ]
     },
     "views": {
-      "js-powered-search": [
+      "jsPoweredSearch": [
         {
-          "id": "js-powered-search-results",
+          "id": "jsPoweredSearchResults",
           "name": "Results",
           "icon": "media/jsps.svg"
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "jsPoweredSearchResults",
+        "contents": "To get started, scaffold a search definition file.\n[Scaffold File](command:jsPoweredSearch.scaffold)\nReady to go? You can search using the currently active file as a search definition.\n[Search Now](command:jsPoweredSearch.search)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "jsPoweredSearch.scaffold",
+          "when": "view == jsPoweredSearchResults"
+        },
+        {
+          "command": "jsPoweredSearch.search",
+          "when": "view == jsPoweredSearchResults"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "jsPoweredSearch.dismissResult",
+          "when": "view == jsPoweredSearchResults && viewItem == result",
+          "group": "inline"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "js-powered-search.scaffold",
+        "command": "jsPoweredSearch.scaffold",
         "title": "Scaffold a search definition file",
         "category": "JS Powered Search"
       },
       {
-        "command": "js-powered-search.search",
+        "command": "jsPoweredSearch.search",
         "title": "Search using this definition file",
         "category": "JS Powered Search"
+      },
+      {
+        "command": "jsPoweredSearch.dismissResult",
+        "title": "Dismiss result",
+        "icon": "$(close)"
       }
     ]
   },

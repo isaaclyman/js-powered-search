@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
 import * as ts from "typescript";
-import * as fs from "fs";
 import * as requireFromString from "require-from-string";
 import {
   FileSearchOptions,
   LineSearchOptions,
   SearchOptions,
 } from "../resources/TEMPLATE";
+import { initializeResultsView, showResult } from "./results";
 
 interface SearchDefinitionModule {
   getSettings: () => SearchOptions;
@@ -20,10 +20,16 @@ interface SearchDefinition {
   searchByFile: FileSearchOptions;
 }
 
-interface FileResult {
+export interface LineResults {
+  [lineNumber: number]: string;
+}
+
+export interface SearchResult {
   file: vscode.Uri;
+  filePath: string;
+  fileName: string;
   matchesByFile: boolean;
-  matchesByLine: number[] | undefined;
+  matchesByLine: LineResults | undefined;
 }
 
 export async function executeSearch() {
@@ -74,7 +80,7 @@ export async function executeSearch() {
   const excludeGlobs = searchDefinition.settings.excludeFilePatterns || [];
   const includeNodeModules =
     searchDefinition.settings.includeNodeModules || false;
-  if (!searchDefinition.settings.includeNodeModules) {
+  if (!includeNodeModules) {
     excludeGlobs.push("**/node_modules/**");
   }
 
@@ -120,7 +126,8 @@ export async function executeSearch() {
   const onlyTestLinesInMatchingFiles =
     searchDefinition.settings.onlyTestLinesInMatchingFiles || false;
 
-  const matches = await vscode.window.withProgress(
+  initializeResultsView();
+  await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
       title: "Searching with the full power of JavaScript...",
@@ -137,78 +144,91 @@ export async function executeSearch() {
         }
       };
 
-      const promiseList: Promise<FileResult>[] = [];
+      const promiseList: Promise<SearchResult | undefined>[] = [];
       for (let fileIx = 0; fileIx < files.length; fileIx++) {
-        const filePromise = new Promise<FileResult>(async (resolve, reject) => {
-          const file = files[fileIx];
-          const stat = await vscode.workspace.fs.stat(file);
-          const exceedsMaxSize =
-            maxFileSizeInKB && stat.size / 1000 > maxFileSizeInKB;
-          if (cancelToken.isCancellationRequested || exceedsMaxSize) {
+        const filePromise = new Promise<SearchResult | undefined>(
+          async (resolve, reject) => {
+            const file = files[fileIx];
+            const stat = await vscode.workspace.fs.stat(file);
+            const exceedsMaxSize =
+              maxFileSizeInKB && stat.size / 1000 > maxFileSizeInKB;
+            if (cancelToken.isCancellationRequested || exceedsMaxSize) {
+              incrementCompletedFiles();
+              resolve(undefined);
+              return;
+            }
+
+            const contentBuffer = await vscode.workspace.fs.readFile(file);
+            const contentString = Buffer.from(contentBuffer).toString("utf8");
+            const contentLines = contentString.includes("\r\n")
+              ? contentString.split("\r\n")
+              : contentString.split("\n");
+            const lineMetadata = {
+              filePath: file.path,
+              fileName: file.path.slice(file.path.lastIndexOf("/") + 1),
+            };
+
+            let matchesByFile = false;
+            if (fileMatcher) {
+              matchesByFile = fileMatcher(contentString, {
+                ...lineMetadata,
+                lines: contentLines,
+              });
+            }
+
+            let matchesByLine: LineResults | undefined = undefined;
+            if (
+              lineMatcher &&
+              (onlyTestLinesInMatchingFiles ? matchesByFile : true)
+            ) {
+              matchesByLine = {} as LineResults;
+              for (let lineIx = 0; lineIx < contentLines.length; lineIx++) {
+                const line = contentLines[lineIx];
+                if (lineMatcher(line, lineMetadata)) {
+                  matchesByLine[lineIx] = line.trim();
+                }
+              }
+            }
+
             incrementCompletedFiles();
             resolve({
               file,
-              matchesByFile: false,
-              matchesByLine: undefined,
-            });
-            return;
-          }
-
-          const contentBuffer = await vscode.workspace.fs.readFile(file);
-          const contentString = Buffer.from(contentBuffer).toString("utf8");
-          const contentLines = contentString.includes("\r\n")
-            ? contentString.split("\r\n")
-            : contentString.split("\n");
-          const lineMetadata = {
-            filePath: file.path,
-            fileName: file.path.slice(file.path.lastIndexOf("/") + 1),
-          };
-
-          let matchesByFile = false;
-          if (fileMatcher) {
-            matchesByFile = fileMatcher(contentString, {
-              ...lineMetadata,
-              lines: contentLines,
+              fileName: getFileName(file),
+              filePath: getFilePath(file),
+              matchesByFile,
+              matchesByLine,
             });
           }
+        );
 
-          let matchesByLine = undefined;
-          if (
-            lineMatcher &&
-            (onlyTestLinesInMatchingFiles ? matchesByFile : true)
-          ) {
-            matchesByLine = [];
-            for (let lineIx = 0; lineIx < contentLines.length; lineIx++) {
-              const line = contentLines[lineIx];
-              if (lineMatcher(line, lineMetadata)) {
-                matchesByLine.push(lineIx);
+        promiseList.push(
+          filePromise.then(
+            (resolved) => {
+              if (!resolved) {
+                return resolved;
               }
-            }
-          }
 
-          incrementCompletedFiles();
-          resolve({
-            file,
-            matchesByFile,
-            matchesByLine,
-          });
-        });
-        promiseList.push(filePromise);
+              if (
+                resolved.matchesByFile ||
+                (resolved.matchesByLine &&
+                  Object.keys(resolved.matchesByLine).length)
+              ) {
+                showResult(resolved);
+              }
+
+              return resolved;
+            },
+            (err) => {
+              console.error(err);
+              return {} as SearchResult;
+            }
+          )
+        );
       }
 
       return Promise.all(promiseList);
     }
   );
-
-  if (!matches) {
-    return;
-  }
-
-  const filteredMatches = matches.filter(
-    (m) => m.matchesByFile || (m.matchesByLine && m.matchesByLine.length)
-  );
-  console.log(`Found ${filteredMatches.length} matching files.`);
-  console.log(filteredMatches);
 }
 
 function tryTranspileFile(
@@ -297,4 +317,13 @@ function validateAndGetSearchDefinition(
   }
 
   return searchDefinition;
+}
+
+function getFileName(file: vscode.Uri): string {
+  const path = getFilePath(file);
+  return path.slice(path.lastIndexOf("/") + 1);
+}
+
+function getFilePath(file: vscode.Uri): string {
+  return file.authority + file.path;
 }
