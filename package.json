@@ -14,7 +14,7 @@
     "url": "https://github.com/isaaclyman/js-powered-search"
   },
   "engines": {
-    "vscode": "^1.57.0"
+    "vscode": "^1.59.0"
   },
   "categories": [
     "Other"
