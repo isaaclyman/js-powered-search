@@ -36,6 +36,12 @@
       }
     ]
   },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "This extension executes code in the workspace and runs tasks, which isn't allowed in Restricted Mode."
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
@@ -56,5 +62,6 @@
     "mocha": "^8.4.0",
     "typescript": "^4.3.2",
     "vscode-test": "^1.5.2"
-  }
+  },
+  "dependencies": {}
 }
