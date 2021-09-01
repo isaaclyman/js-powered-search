@@ -1,6 +1,6 @@
 export const TEMPLATE = `
 
-interface SearchOptions {
+export interface SearchOptions {
   includeFilePatterns?: string[]; // globs to include, e.g. ['*.ts']. Searches all files by default.
   excludeFilePatterns?: string[]; // globs to exclude.
   includeNodeModules?: boolean; // (default: false) true if node_modules should be searched. Strongly discouraged.
@@ -14,13 +14,13 @@ export function getSettings(): SearchOptions {
   };
 }
 
-interface SearchMetadata {
+export interface SearchMetadata {
   fileName: string;
   filePath: string;
   fileSizeInKB: string; // Useful for skipping extremely large files, if you need to speed up performance
 }
 
-interface LineSearchOptions {
+export interface LineSearchOptions {
   // A function that accepts a line of text and determines whether it matches your search.
   // If you only want to search by file, set this method to undefined.
   doesLineMatchSearch?: (line: string, metadata: SearchMetadata) => boolean;
@@ -34,7 +34,7 @@ export function searchByLine(): LineSearchOptions {
   };
 }
 
-interface FileSearchOptions {
+export interface FileSearchOptions {
   // A function that accepts a file (as an array of lines of text) and determines whether the file matches your search.
   // If you only want to search by line, set this method to undefined.
   doesFileMatchSearch?: (

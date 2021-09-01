@@ -42,3 +42,4 @@ Initial release.
 ## Wishlist
 
 - Allow passing in a fake "test file" or "test line" to the appropriate functions. The contents should pass the test defined by the predicate. Otherwise, you'll receive an error message. This will give a quick understanding of what the test is looking for.
+- Allow imports in search definition file. (This is untested, probably doesn't work, and may not be possible.)
