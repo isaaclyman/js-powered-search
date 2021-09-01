@@ -40,7 +40,8 @@ This executes a full workspace search using the currently active file as a searc
 
 ## Known Issues
 
-Extension is in preview.
+- Extension is in preview.
+- Search definition files should not import other files. This is untested behavior and not currently in scope.
 
 ## Release Notes
 
@@ -50,5 +51,6 @@ Initial release.
 
 ## Wishlist
 
-- Allow passing in a fake "test file" or "test line" to the appropriate functions. The contents should pass the test defined by the predicate. Otherwise, you'll receive an error message. This will give a quick understanding of what the test is looking for.
-- Allow imports in search definition file. (This is untested, probably doesn't work, and may not be possible.)
+- Allow passing in "test files" or "test lines" to the appropriate functions. The user indicates whether the contents should pass or fail the test defined by the predicate. Tests must pass before search begins; otherwise, the user sees an error message. This will give a quick understanding of what the test is looking for.
+- Allow imports in search definition files. (This probably doesn't work and may not be possible.)
+- Write tests for this extension to ensure maintainability.
