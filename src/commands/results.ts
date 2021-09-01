@@ -24,6 +24,8 @@ export class JSPSResult extends vscode.TreeItem {
         } as vscode.TextDocumentShowOptions,
       ],
     };
+    this.resourceUri = type === "file" ? searchResult.file : undefined;
+    this.iconPath = type === "file" ? vscode.ThemeIcon.File : undefined;
   }
 }
 
