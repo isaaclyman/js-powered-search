@@ -1,9 +1,13 @@
 {
-  "name": "jsPoweredSearch",
+  "name": "js-powered-search",
   "displayName": "JS Powered Search",
   "description": "Use the full power of JavaScript to search your project",
   "version": "0.0.1",
   "publisher": "Isaac Lyman",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isaaclyman/js-powered-search"
+  },
   "engines": {
     "vscode": "^1.57.0"
   },
