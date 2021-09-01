@@ -1,33 +1,52 @@
+interface SearchOptions {
+  includeFilePatterns?: string[]; // globs to include, e.g. ['*.ts']
+  excludeFilePatterns?: string[]; // globs to exclude
+  includeNodeModules?: boolean; // true if node_modules should be searched. Strongly discouraged.
+}
+
+export function getSettings(): SearchOptions {
+  return {
+    // includeFilePatterns: [],
+    // excludeFilePatterns: [],
+    // includeNodeModules: false,
+  };
+}
+
+interface SearchMetadata {
+  fileName: string;
+  filePath: string;
+  fileSizeInKB: string; // Useful for skipping extremely large files, if you need to speed up performance
+}
+
+interface LineSearchOptions {
+  // A function that accepts a line of text and determines whether it matches your search.
+  // If you only want to search by file, set this method to undefined.
+  doesLineMatchSearch: (line: string, metadata: SearchMetadata) => boolean;
+}
+
 export function searchByLine(): LineSearchOptions {
   return {
-    includeFilePatterns: ["*.ts"],
     doesLineMatchSearch: (line) => {
       return line.includes("exactly what I'm looking for");
     },
   };
 }
 
+interface FileSearchOptions {
+  // A function that accepts a file (as an array of lines of text) and determines whether the file matches your search.
+  // If you only want to search by line, set this method to undefined.
+  doesFileMatchSearch?: (
+    fileContents: string[],
+    metadata: SearchMetadata
+  ) => boolean;
+}
+
 export function searchByFile(): FileSearchOptions {
   return {
-    includeFilePatterns: ["*.ts"],
     doesFileMatchSearch: (lines) => {
       return lines.some((line) =>
-        line.startsWith("a start-of-line string I want to see")
+        line.includes("another thing I'm looking for")
       );
     },
   };
-}
-
-interface CommonSearchOptions {
-  includeFilePatterns?: string[]; // default: includes all files
-  excludeFilePatterns?: string[];
-  includeNodeModules?: boolean; // default: false
-}
-
-interface LineSearchOptions extends CommonSearchOptions {
-  doesLineMatchSearch: (line: string) => boolean;
-}
-
-interface FileSearchOptions extends CommonSearchOptions {
-  doesFileMatchSearch: (fileContents: string[]) => boolean;
 }
