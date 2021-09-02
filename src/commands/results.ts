@@ -1,3 +1,4 @@
+import { performance } from "perf_hooks";
 import * as vscode from "vscode";
 import { SearchResult } from "./search";
 
@@ -40,6 +41,8 @@ export class JSPSResultsProvider
   readonly onDidChangeTreeData: vscode.Event<JSPSResult | undefined> =
     this._onDidChangeTreeData.event;
 
+  private messageSuffix = "";
+
   constructor() {}
 
   refresh(result: JSPSResult | undefined = undefined) {
@@ -52,9 +55,7 @@ export class JSPSResultsProvider
 
   getChildren(element?: JSPSResult): Promise<JSPSResult[]> {
     if (!element) {
-      if (this.tree) {
-        this.tree.message = `${this.results.length} files found`;
-      }
+      this.updateMessage();
       return Promise.resolve(
         this.results.map(
           (result) =>
@@ -91,6 +92,18 @@ export class JSPSResultsProvider
       );
     }
     return Promise.resolve(children);
+  }
+
+  updateMessage() {
+    if (this.tree) {
+      this.tree.message = `${this.results.length} files found${
+        this.messageSuffix || ""
+      }`;
+    }
+  }
+
+  setMessageSuffix(suffix: string = "") {
+    this.messageSuffix = suffix;
   }
 }
 
@@ -129,11 +142,14 @@ vscode.commands.registerCommand(
   }
 );
 
+let searchStartTime: number;
 export function initializeResultsView() {
   if (resultsProvider) {
     resultsProvider.results = [];
     resultsProvider.refresh();
   }
+  resultsProvider.setMessageSuffix();
+  searchStartTime = performance.now();
 
   vscode.commands.executeCommand("jsPoweredSearchResults.focus");
 }
@@ -145,4 +161,26 @@ export function showResult(result: SearchResult) {
 
   resultsProvider.results.push(result);
   resultsProvider.refresh();
+}
+
+export function finalizeResultsView() {
+  const searchEndTime = performance.now();
+  const elapsed = searchEndTime - searchStartTime;
+  resultsProvider.setMessageSuffix(` in ${getFriendlyTime(elapsed)}.`);
+}
+
+function getFriendlyTime(ms: number): string {
+  const seconds = ms / 1000;
+
+  if (seconds <= 100) {
+    return `${seconds.toFixed(2)} seconds`;
+  }
+
+  const minutes = seconds / 60;
+  if (minutes < 60) {
+    return `${minutes.toFixed(2)} minutes`;
+  }
+
+  const hours = minutes / 60;
+  return `${hours.toFixed(2)} hours`;
 }

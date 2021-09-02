@@ -6,7 +6,11 @@ import {
   LineSearchOptions,
   SearchOptions,
 } from "../resources/TEMPLATE";
-import { initializeResultsView, showResult } from "./results";
+import {
+  finalizeResultsView,
+  initializeResultsView,
+  showResult,
+} from "./results";
 
 interface SearchDefinitionModule {
   getSettings: () => SearchOptions;
@@ -127,6 +131,7 @@ export async function executeSearch() {
     searchDefinition.settings.onlyTestLinesInMatchingFiles || false;
 
   initializeResultsView();
+
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -149,6 +154,9 @@ export async function executeSearch() {
         const filePromise = new Promise<SearchResult | undefined>(
           async (resolve, reject) => {
             const file = files[fileIx];
+            const fileName = getFileName(file);
+            const filePath = getFilePath(file);
+
             const stat = await vscode.workspace.fs.stat(file);
             const exceedsMaxSize =
               maxFileSizeInKB && stat.size / 1000 > maxFileSizeInKB;
@@ -158,14 +166,26 @@ export async function executeSearch() {
               return;
             }
 
+            if (!fileMatcher && !lineMatcher) {
+              incrementCompletedFiles();
+              resolve({
+                file,
+                fileName,
+                filePath,
+                matchesByFile: true,
+                matchesByLine: undefined,
+              });
+              return;
+            }
+
             const contentBuffer = await vscode.workspace.fs.readFile(file);
             const contentString = Buffer.from(contentBuffer).toString("utf8");
             const contentLines = contentString.includes("\r\n")
               ? contentString.split("\r\n")
               : contentString.split("\n");
             const lineMetadata = {
-              filePath: file.path,
-              fileName: file.path.slice(file.path.lastIndexOf("/") + 1),
+              filePath,
+              fileName,
             };
 
             let matchesByFile = false;
@@ -193,8 +213,8 @@ export async function executeSearch() {
             incrementCompletedFiles();
             resolve({
               file,
-              fileName: getFileName(file),
-              filePath: getFilePath(file),
+              fileName,
+              filePath,
               matchesByFile,
               matchesByLine,
             });
@@ -229,6 +249,8 @@ export async function executeSearch() {
       return Promise.all(promiseList);
     }
   );
+
+  finalizeResultsView();
 }
 
 function tryTranspileFile(
