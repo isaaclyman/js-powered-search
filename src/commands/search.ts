@@ -180,9 +180,7 @@ export async function executeSearch() {
 
             const contentBuffer = await vscode.workspace.fs.readFile(file);
             const contentString = Buffer.from(contentBuffer).toString("utf8");
-            const contentLines = contentString.includes("\r\n")
-              ? contentString.split("\r\n")
-              : contentString.split("\n");
+            const contentLines = splitByLine(contentString);
             const lineMetadata = {
               filePath,
               fileName,
@@ -348,4 +346,10 @@ function getFileName(file: vscode.Uri): string {
 
 function getFilePath(file: vscode.Uri): string {
   return file.authority + file.path;
+}
+
+export function splitByLine(multilineString: string): string[] {
+  return multilineString.includes("\r\n")
+    ? multilineString.split("\r\n")
+    : multilineString.split("\n");
 }

@@ -44,7 +44,6 @@ This executes a full workspace search using the currently active file as a searc
 
 - Extension is in preview.
 - Search definition files should not import other files. This is untested behavior and not currently in scope.
-- It is unknown if the line-splitting functionality understands the difference between "real newlines" and "fake newlines" (e.g. \n in a user-defined string).
 
 ## Wishlist
 
