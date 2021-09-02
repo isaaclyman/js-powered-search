@@ -46,12 +46,6 @@ This executes a full workspace search using the currently active file as a searc
 - Search definition files should not import other files. This is untested behavior and not currently in scope.
 - It is unknown if the line-splitting functionality understands the difference between "real newlines" and "fake newlines" (e.g. \n in a user-defined string).
 
-## Release Notes
-
-### 0.0.1
-
-Initial release.
-
 ## Wishlist
 
 - Allow passing in "test files" or "test lines" to the appropriate functions. The user indicates whether the contents should pass or fail the test defined by the predicate. Tests must pass before search begins; otherwise, the user sees an error message. This will give a quick understanding of what the test is looking for.
