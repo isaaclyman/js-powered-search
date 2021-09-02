@@ -169,7 +169,7 @@ export function finalizeResultsView() {
   resultsProvider.setMessageSuffix(` in ${getFriendlyTime(elapsed)}.`);
 }
 
-function getFriendlyTime(ms: number): string {
+export function getFriendlyTime(ms: number): string {
   const seconds = ms / 1000;
 
   if (seconds <= 100) {

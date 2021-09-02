@@ -274,7 +274,7 @@ function tryRequire(src: string, filename: string = ""): any | undefined {
   }
 }
 
-function validateAndGetSearchDefinition(
+export function validateAndGetSearchDefinition(
   module: SearchDefinitionModule
 ): SearchDefinition | undefined {
   if (typeof module.getSettings !== "function") {

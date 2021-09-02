@@ -116,7 +116,7 @@ async function chooseWorkspaceFolder(
   return chosenFolder.uri;
 }
 
-async function determineFilename(
+export async function determineFilename(
   projectRoot: vscode.Uri,
   template: string
 ): Promise<string> {
