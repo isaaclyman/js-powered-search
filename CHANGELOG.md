@@ -22,9 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When searching without a file or line matcher, return all files that match the patterns.
 - When a search is complete, report how long it took in the Results pane.
 
-## [0.0.4] = 2021-09-04
+## [0.0.4] - 2021-09-04
 
 - Added unit tests for scaffolding, searching, and showing results.
 - Created a preliminary testing feature to ensure matchers work on one file before running them in parallel on all files.
 - Added a `matchTestingTimeoutInSeconds` feature to the search settings. If the preliminary test takes longer than this, the user will see an error.
 - If the preliminary test fails for whatever reason, the user may still choose to continue the search.
+
+## [0.0.5] - 2021-09-04
+
+- Fixed broken repo link in README.
