@@ -11,6 +11,7 @@ import {
   initializeResultsView,
   showResult,
 } from "./results";
+import { performance } from "perf_hooks";
 
 interface SearchDefinitionModule {
   getSettings: () => SearchOptions;
@@ -18,7 +19,7 @@ interface SearchDefinitionModule {
   searchByFile: () => FileSearchOptions;
 }
 
-interface SearchDefinition {
+export interface SearchDefinition {
   settings: SearchOptions;
   searchByLine: LineSearchOptions;
   searchByFile: FileSearchOptions;
@@ -28,13 +29,15 @@ export interface LineResults {
   [lineNumber: number]: string;
 }
 
-export interface SearchResult {
+export interface SearchSuccessResult {
   file: vscode.Uri;
   filePath: string;
   fileName: string;
   matchesByFile: boolean;
   matchesByLine: LineResults | undefined;
 }
+
+export type SearchResult = SearchSuccessResult | Error | undefined;
 
 export async function executeSearch() {
   const activeFile = vscode.window.activeTextEditor;
@@ -108,9 +111,10 @@ export async function executeSearch() {
     vscode.window.showErrorMessage(
       "No files matched the provided file patterns. Check your settings object."
     );
+    return;
   }
 
-  if (files.length > 200) {
+  if (files.length > 500) {
     const confirm = await vscode.window.showWarningMessage(
       `The provided patterns matched ${files.length} files. Are you sure you want to continue with the search?`,
       "Cancel",
@@ -121,16 +125,40 @@ export async function executeSearch() {
     }
   }
 
-  const maxFileSizeInKB =
-    typeof searchDefinition.settings.maxFileSizeInKB === "number"
-      ? searchDefinition.settings.maxFileSizeInKB
-      : 1000;
-  const fileMatcher = searchDefinition.searchByFile.doesFileMatchSearch;
-  const lineMatcher = searchDefinition.searchByLine.doesLineMatchSearch;
-  const onlyTestLinesInMatchingFiles =
-    searchDefinition.settings.onlyTestLinesInMatchingFiles || false;
-
   initializeResultsView();
+
+  if (files.length > 1) {
+    const err = await runPreliminaryTest(files.shift()!, searchDefinition, result => {
+      if (!result || result instanceof Error) {
+        return result;
+      }
+
+      if (
+        result.matchesByFile ||
+        (result.matchesByLine &&
+          Object.keys(result.matchesByLine).length)
+      ) {
+        showResult(result);
+      }
+
+      return result;
+    });
+    
+    if (err instanceof Error) {
+      console.error(err);
+      const message = (err && err.message) || err.toString();
+      const truncated =
+        message.length <= 255 ? message : message.slice(0, 255) + "...";
+      const confirm = await vscode.window.showErrorMessage(
+        `One or both matchers failed on the first file tested. Error: "${truncated}". Do you want to continue the search anyway?`,
+        "Cancel",
+        "Search"
+      );
+      if (confirm !== "Search") {
+        return;
+      }
+    }
+  }
 
   await vscode.window.withProgress(
     {
@@ -141,110 +169,36 @@ export async function executeSearch() {
     (progress, cancelToken) => {
       const progressStepSize = Math.floor(files.length / 25) || 1;
       let completedFiles = 0;
-      const incrementCompletedFiles = () => {
-        completedFiles++;
 
-        if (completedFiles % progressStepSize === 0) {
-          progress.report({ increment: (completedFiles / files.length) * 100 });
-        }
-      };
+      const filePromises = testFiles(
+        files,
+        searchDefinition,
+        cancelToken,
+        (result) => {
+          completedFiles++;
 
-      const promiseList: Promise<SearchResult | undefined>[] = [];
-      for (let fileIx = 0; fileIx < files.length; fileIx++) {
-        const filePromise = new Promise<SearchResult | undefined>(
-          async (resolve, reject) => {
-            const file = files[fileIx];
-            const fileName = getFileName(file);
-            const filePath = getFilePath(file);
-
-            const stat = await vscode.workspace.fs.stat(file);
-            const exceedsMaxSize =
-              maxFileSizeInKB && stat.size / 1000 > maxFileSizeInKB;
-            if (cancelToken.isCancellationRequested || exceedsMaxSize) {
-              incrementCompletedFiles();
-              resolve(undefined);
-              return;
-            }
-
-            if (!fileMatcher && !lineMatcher) {
-              incrementCompletedFiles();
-              resolve({
-                file,
-                fileName,
-                filePath,
-                matchesByFile: true,
-                matchesByLine: undefined,
-              });
-              return;
-            }
-
-            const contentBuffer = await vscode.workspace.fs.readFile(file);
-            const contentString = Buffer.from(contentBuffer).toString("utf8");
-            const contentLines = splitByLine(contentString);
-            const lineMetadata = {
-              filePath,
-              fileName,
-            };
-
-            let matchesByFile = false;
-            if (fileMatcher) {
-              matchesByFile = fileMatcher(contentString, {
-                ...lineMetadata,
-                lines: contentLines,
-              });
-            }
-
-            let matchesByLine: LineResults | undefined = undefined;
-            if (
-              lineMatcher &&
-              (onlyTestLinesInMatchingFiles ? matchesByFile : true)
-            ) {
-              matchesByLine = {} as LineResults;
-              for (let lineIx = 0; lineIx < contentLines.length; lineIx++) {
-                const line = contentLines[lineIx];
-                if (lineMatcher(line, lineMetadata)) {
-                  matchesByLine[lineIx] = line.trim();
-                }
-              }
-            }
-
-            incrementCompletedFiles();
-            resolve({
-              file,
-              fileName,
-              filePath,
-              matchesByFile,
-              matchesByLine,
+          if (completedFiles % progressStepSize === 0) {
+            progress.report({
+              increment: (completedFiles / files.length) * 100,
             });
           }
-        );
 
-        promiseList.push(
-          filePromise.then(
-            (resolved) => {
-              if (!resolved) {
-                return resolved;
-              }
+          if (!result || result instanceof Error) {
+            return result;
+          }
 
-              if (
-                resolved.matchesByFile ||
-                (resolved.matchesByLine &&
-                  Object.keys(resolved.matchesByLine).length)
-              ) {
-                showResult(resolved);
-              }
+          if (
+            result.matchesByFile ||
+            (result.matchesByLine &&
+              Object.keys(result.matchesByLine).length)
+          ) {
+            showResult(result);
+          }
 
-              return resolved;
-            },
-            (err) => {
-              console.error(err);
-              return {} as SearchResult;
-            }
-          )
-        );
-      }
-
-      return Promise.all(promiseList);
+          return result;
+        }
+      );
+      return Promise.all(filePromises);
     }
   );
 
@@ -348,8 +302,149 @@ function getFilePath(file: vscode.Uri): string {
   return file.authority + file.path;
 }
 
+async function getFileAsText(file: vscode.Uri): Promise<string> {
+  const contentBuffer = await vscode.workspace.fs.readFile(file);
+  const contentString = Buffer.from(contentBuffer).toString("utf8");
+  return contentString;
+}
+
 export function splitByLine(multilineString: string): string[] {
   return multilineString.includes("\r\n")
     ? multilineString.split("\r\n")
     : multilineString.split("\n");
+}
+
+export async function runPreliminaryTest(
+  file: vscode.Uri,
+  searchDefinition: SearchDefinition,
+  onComplete?: (result: SearchResult) => SearchResult
+): Promise<SearchResult> {
+  const testTimeout =
+    typeof searchDefinition.settings.matchTestingTimeoutInSeconds === "number"
+      ? searchDefinition.settings.matchTestingTimeoutInSeconds
+      : 5;
+
+  return new Promise((resolve) => {
+    const startTime = performance.now();
+
+    testFiles(
+      [file],
+      searchDefinition,
+      new vscode.CancellationTokenSource().token,
+      onComplete
+    )[0].then((result) => {
+      const endTime = performance.now();
+
+      if (testTimeout && endTime - startTime > testTimeout * 1000) {
+        resolve(
+          new Error(
+            `Matchers took more than ${testTimeout} seconds on a single file.`
+          )
+        );
+        return;
+      }
+
+      resolve(result);
+      return;
+    });
+  });
+}
+
+export function testFiles(
+  files: vscode.Uri[],
+  searchDefinition: SearchDefinition,
+  cancelToken: vscode.CancellationToken,
+  onComplete?: (result: SearchResult) => SearchResult
+): Thenable<SearchResult>[] {
+  const maxFileSizeInKB =
+    typeof searchDefinition.settings.maxFileSizeInKB === "number"
+      ? searchDefinition.settings.maxFileSizeInKB
+      : 1000;
+  const fileMatcher = searchDefinition.searchByFile.doesFileMatchSearch;
+  const lineMatcher = searchDefinition.searchByLine.doesLineMatchSearch;
+  const onlyTestLinesInMatchingFiles =
+    searchDefinition.settings.onlyTestLinesInMatchingFiles || false;
+
+  const promiseList: Thenable<SearchResult>[] = [];
+  for (let fileIx = 0; fileIx < files.length; fileIx++) {
+    const file = files[fileIx];
+    const fileName = getFileName(file);
+    const filePath = getFilePath(file);
+
+    const filePromise: Thenable<SearchResult> = vscode.workspace.fs
+      .stat(file)
+      .then<SearchResult>((stat) => {
+        const exceedsMaxSize =
+          maxFileSizeInKB && stat.size / 1000 > maxFileSizeInKB;
+        if (cancelToken.isCancellationRequested || exceedsMaxSize) {
+          return undefined;
+        }
+
+        if (!fileMatcher && !lineMatcher) {
+          return {
+            file,
+            fileName,
+            filePath,
+            matchesByFile: true,
+            matchesByLine: undefined,
+          };
+        }
+
+        return getFileAsText(file).then((contentString): SearchResult => {
+          const contentLines = splitByLine(contentString);
+          const lineMetadata = {
+            filePath,
+            fileName,
+          };
+
+          let matchesByFile = false;
+          if (fileMatcher) {
+            matchesByFile = fileMatcher(contentString, {
+              ...lineMetadata,
+              lines: contentLines,
+            });
+          }
+
+          let matchesByLine: LineResults | undefined = undefined;
+          if (
+            lineMatcher &&
+            (onlyTestLinesInMatchingFiles ? matchesByFile : true)
+          ) {
+            matchesByLine = {} as LineResults;
+            for (let lineIx = 0; lineIx < contentLines.length; lineIx++) {
+              const line = contentLines[lineIx];
+              if (lineMatcher(line, lineMetadata)) {
+                matchesByLine[lineIx] = line.trim();
+              }
+            }
+          }
+
+          return {
+            file,
+            fileName,
+            filePath,
+            matchesByFile,
+            matchesByLine,
+          } as SearchSuccessResult;
+        });
+      })
+      .then<SearchResult>(
+        resolved => resolved,
+        (err): Error => {
+          console.error(err);
+          return err;
+        }
+      )
+      .then<SearchResult>((completed) => {
+        if (typeof onComplete !== "function") {
+          return completed;
+        }
+
+        return onComplete(completed);
+      });
+
+    promiseList.push(filePromise);
+  }
+
+  return promiseList;
 }

@@ -49,5 +49,4 @@ This executes a full workspace search using the currently active file as a searc
 
 - Allow passing in "test files" or "test lines" to the appropriate functions. The user indicates whether the contents should pass or fail the test defined by the predicate. Tests must pass before search begins; otherwise, the user sees an error message. This will give a quick understanding of what the test is looking for.
 - Allow imports in search definition files. (This probably doesn't work and may not be possible.)
-- Do a performance check before the search. Test the matchers on 1 file to make sure they'll run without errors. Then test them on 10 files to get an idea for how fast they are. If average time per file \* number of files matched > 30 seconds, warn the user and give them the option to cancel.
-- Write more tests for this extension.
+- Allow searchByLine, doesLineMatchSearch, searchByFile, and doesFileMatchSearch to return a Promise for asynchronous compatibility. (Likely only useful if imports become functional.)

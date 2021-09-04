@@ -6,6 +6,7 @@ export interface SearchOptions {
   includeNodeModules?: boolean; // (default: false) true if node_modules should be searched. Strongly discouraged.
   maxFileSizeInKB?: number; // (default: 1000) any files larger than this will be skipped.
   onlyTestLinesInMatchingFiles?: boolean; // (default: false) true if searchByLine should only be used on files that pass searchByFile
+  matchTestingTimeoutInSeconds?: number; // (default: 5) search is tested on a single file preliminarily. If your matchers takes longer than this, an error will appear.
 }
 
 export function getSettings(): SearchOptions {
@@ -15,6 +16,7 @@ export function getSettings(): SearchOptions {
     // includeNodeModules: false,
     // maxFileSizeInKB: 1000,
     // onlyTestLinesInMatchingFiles: false
+    // matchTestingTimeoutInSeconds: 5
   };
 }
 

@@ -1,11 +1,11 @@
 import { performance } from "perf_hooks";
 import * as vscode from "vscode";
-import { SearchResult } from "./search";
+import { SearchSuccessResult } from "./search";
 
 export class JSPSResult extends vscode.TreeItem {
   constructor(
     public readonly type: "file" | "line",
-    public readonly searchResult: SearchResult,
+    public readonly searchResult: SearchSuccessResult,
     public readonly label: string,
     public readonly filePathOrFullLine: string,
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
@@ -33,7 +33,7 @@ export class JSPSResult extends vscode.TreeItem {
 export class JSPSResultsProvider
   implements vscode.TreeDataProvider<JSPSResult>
 {
-  public results: SearchResult[] = [];
+  public results: SearchSuccessResult[] = [];
   public tree: vscode.TreeView<JSPSResult> | undefined;
 
   private _onDidChangeTreeData: vscode.EventEmitter<JSPSResult | undefined> =
@@ -154,7 +154,7 @@ export function initializeResultsView() {
   vscode.commands.executeCommand("jsPoweredSearchResults.focus");
 }
 
-export function showResult(result: SearchResult) {
+export function showResult(result: SearchSuccessResult) {
   if (!resultsProvider) {
     return;
   }
