@@ -32,3 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.5] - 2021-09-04
 
 - Fixed broken repo link in README.
+
+## [0.0.6] - 2021-09-10
+
+- Added the "Export JSON" command, which exports all current search results to a JSON document in a new text editor window.
