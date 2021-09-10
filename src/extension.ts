@@ -1,6 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
+import { exportResults } from "./commands/export";
 import { scaffoldSearchDefinition } from "./commands/scaffold";
 import { executeSearch } from "./commands/search";
 
@@ -9,8 +10,8 @@ import { executeSearch } from "./commands/search";
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     // SCAFFOLD
-    // Creates a search definition file using the active text editor
-    // Overwrites the file currently being viewed
+    // Creates a search definition file
+    // Uses a new text editor window, a new file at project root, or overwrites the current file
     vscode.commands.registerCommand("jsPoweredSearch.scaffold", async () => {
       try {
         await scaffoldSearchDefinition();
@@ -22,12 +23,23 @@ export function activate(context: vscode.ExtensionContext) {
 
     // SEARCH
     // Validates the active text editor, then uses it as a search definition
-    // Opens a new window with all search results
+    // Lists search results in the JSPS Results view
     vscode.commands.registerCommand("jsPoweredSearch.search", async () => {
       try {
         await executeSearch();
       } catch (e) {
         vscode.window.showErrorMessage("Uncaught error in search command.");
+        console.error(e);
+      }
+    }),
+
+    // JSON EXPORT
+    // Exports all current search results as a JSON document in a new text editor window
+    vscode.commands.registerCommand("jsPoweredSearch.exportJson", async () => {
+      try {
+        await exportResults();
+      } catch (e) {
+        vscode.window.showErrorMessage("Uncaught error in export JSON command.");
         console.error(e);
       }
     })

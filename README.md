@@ -28,7 +28,7 @@ Run the search whenever you're ready, and results will show up in the JSPS Resul
 
 ## How to begin
 
-Open the Command Palette with Ctrl + Shift + P. JS Powered Search provides two commands:
+Open the Command Palette with Ctrl + Shift + P and type `JSPS`, or visit the JSPS Results view in your activity bar to get started. JS Powered Search provides three commands:
 
 ### Scaffold
 
@@ -40,6 +40,10 @@ From here, defining your search parameters is up to you. You can use multiple gl
 
 This executes a full workspace search using the currently active file as a search definition. JSPS will let you know if there's something wrong with your file, and the operation can be cancelled at any point. The JSPS Results pane will open to show results as they come in. Click any search result to jump to it in your codebase, or click the X icon to dismiss it.
 
+### JSON Export
+
+This exports all current search results to a JSON document, which will appear in a new text editor window.
+
 ## Known Issues
 
 - Extension is in preview.
@@ -50,3 +54,5 @@ This executes a full workspace search using the currently active file as a searc
 - Allow passing in "test files" or "test lines" to the appropriate functions. The user indicates whether the contents should pass or fail the test defined by the predicate. Tests must pass before search begins; otherwise, the user sees an error message. This will give a quick understanding of what the test is looking for.
 - Allow imports in search definition files. (This probably doesn't work and may not be possible.)
 - Allow searchByLine, doesLineMatchSearch, searchByFile, and doesFileMatchSearch to return a Promise for asynchronous compatibility. (Likely only useful if imports become functional.)
+- Include 'nextLine' and 'previousLine' in line matcher metadata so that immediate neighbors of a line can be tested as well.
+- Find-and-replace: for any matched line or file, let the user provide a function to pass it into that returns what it should be changed to.

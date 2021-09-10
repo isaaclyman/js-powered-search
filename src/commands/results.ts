@@ -184,3 +184,7 @@ export function getFriendlyTime(ms: number): string {
   const hours = minutes / 60;
   return `${hours.toFixed(2)} hours`;
 }
+
+export function getAllResults(): SearchSuccessResult[] {
+  return resultsProvider.results;
+}
