@@ -2,8 +2,6 @@
 
 **Array.filter for every file in your codebase**
 
-Suppose you're working in a large codebase and for personal reasons you need to find every file with a `.cs` extension that imports `urlUtilityClass`, uses the `urlJoin` method of that class two or more times, uses the `protocolReplace` method of that class _exactly three times_, and _never_ uses the `validateUrl` method of that class. (It's okay, we're all working with legacy code here.) Feel a RegEx headache coming on?
-
 JS Powered Search (JSPS) is a simple engine for searching a project using the full power of JavaScript. It's more powerful than RegEx and _way_ more powerful than a text search, although it has the ability to do both. Any stateful logic you can write with code, you can use in JSPS -- search depth, complexity, and performance are all up to you.
 
 JSPS scaffolds a self-contained search definition file which you can alter by writing code to determine whether each file or line of code matches your search. You can save useful search definitions to your computer, making it easy to run them from the Command Palette or the JSPS Results pane later. If you commit your search definitions to version control, the whole team can use them just as easily.
