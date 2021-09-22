@@ -36,3 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.6] - 2021-09-10
 
 - Added the "Export JSON" command, which exports all current search results to a JSON document in a new text editor window.
+
+## [1.0.0] = 2021-09-22
+
+- Improve the seach template's usability and readability. Take JSPS out of preview.

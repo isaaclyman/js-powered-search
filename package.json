@@ -7,7 +7,7 @@
     "name": "Isaac Lyman",
     "url": "https://isaaclyman.com"
   },
-  "version": "0.0.6",
+  "version": "1.0.0",
   "publisher": "IsaacLyman",
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
     "project-wide",
     "universal"
   ],
-  "preview": true,
+  "preview": false,
   "activationEvents": [
     "onCommand:jsPoweredSearch.scaffold",
     "onCommand:jsPoweredSearch.search",
