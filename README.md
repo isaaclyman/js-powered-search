@@ -44,7 +44,6 @@ This exports all current search results to a JSON document, which will appear in
 
 ## Known Issues
 
-- Extension is in preview.
 - Search definition files should not import other files. This is untested behavior and not currently in scope.
 
 ## Wishlist
