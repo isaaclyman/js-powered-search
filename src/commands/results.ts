@@ -35,6 +35,7 @@ export class JSPSResultsProvider
 {
   public results: SearchSuccessResult[] = [];
   public tree: vscode.TreeView<JSPSResult> | undefined;
+  public isDirty = false;
 
   private _onDidChangeTreeData: vscode.EventEmitter<JSPSResult | undefined> =
     new vscode.EventEmitter<JSPSResult | undefined>();
@@ -54,6 +55,10 @@ export class JSPSResultsProvider
   }
 
   getChildren(element?: JSPSResult): Promise<JSPSResult[]> {
+    if (!this.isDirty) {
+      return Promise.resolve([]);
+    }
+
     if (!element) {
       this.updateMessage();
       return Promise.resolve(
@@ -143,7 +148,7 @@ vscode.commands.registerCommand(
 );
 
 let searchStartTime: number;
-export function initializeResultsView() {
+export function resetResultsView() {
   if (resultsProvider) {
     resultsProvider.results = [];
     resultsProvider.refresh();
@@ -159,14 +164,17 @@ export function showResult(result: SearchSuccessResult) {
     return;
   }
 
+  resultsProvider.isDirty = true;
   resultsProvider.results.push(result);
   resultsProvider.refresh();
 }
 
 export function finalizeResultsView() {
+  resultsProvider.isDirty = true;
   const searchEndTime = performance.now();
   const elapsed = searchEndTime - searchStartTime;
   resultsProvider.setMessageSuffix(` in ${getFriendlyTime(elapsed)}.`);
+  resultsProvider.refresh();
 }
 
 export function getFriendlyTime(ms: number): string {

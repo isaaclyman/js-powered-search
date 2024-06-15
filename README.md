@@ -49,5 +49,4 @@ This exports all current search results to a JSON document, which will appear in
 ## Wishlist
 
 - Allow passing in "test files" or "test lines" to the appropriate functions. The user indicates whether the contents should pass or fail the test defined by the predicate. Tests must pass before search begins; otherwise, the user sees an error message. This will give a quick understanding of what the test is looking for.
-- Include 'nextLine' and 'previousLine' in line matcher metadata so that immediate neighbors of a line can be tested as well.
 - Find-and-replace: for any matched line or file, let the user provide a function to pass it into that returns what it should be changed to.

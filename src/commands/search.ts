@@ -8,7 +8,7 @@ import {
 } from "../resources/TEMPLATE";
 import {
   finalizeResultsView,
-  initializeResultsView,
+  resetResultsView,
   showResult,
 } from "./results";
 import { performance } from "perf_hooks";
@@ -125,7 +125,7 @@ export async function executeSearch() {
     }
   }
 
-  initializeResultsView();
+  resetResultsView();
 
   if (files.length > 1) {
     const err = await runPreliminaryTest(
