@@ -1,5 +1,4 @@
 export const TEMPLATE = `
-
 //
 // Edit these functions to define search parameters. Type definitions are at the bottom of this file.
 //
@@ -51,6 +50,8 @@ export interface SearchOptions {
 export interface LineSearchMetadata {
   fileName: string;
   filePath: string;
+  previousLine: string | null;
+  nextLine: string | null;
 }
 
 export interface LineSearchOptions {

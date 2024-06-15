@@ -7,14 +7,14 @@
     "name": "Isaac Lyman",
     "url": "https://isaaclyman.com"
   },
-  "version": "1.0.1",
+  "version": "1.1.0",
   "publisher": "IsaacLyman",
   "repository": {
     "type": "git",
     "url": "https://github.com/isaaclyman/js-powered-search"
   },
   "engines": {
-    "vscode": "^1.59.0"
+    "vscode": "^1.75.0"
   },
   "categories": [
     "Other"
@@ -26,12 +26,43 @@
     "universal"
   ],
   "preview": false,
-  "activationEvents": [
-    "onCommand:jsPoweredSearch.scaffold",
-    "onCommand:jsPoweredSearch.search",
-    "onCommand:jsPoweredSearch.exportJson"
-  ],
-  "main": "./out/extension.js",
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "20.14.2",
+    "@types/sinon": "^17.0.3",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0",
+    "esbuild": "^0.21.5",
+    "eslint": "^8.57.0",
+    "glob": "^10.4.1",
+    "mocha": "^10.4.0",
+    "npm-run-all": "^4.1.5",
+    "sinon": "^18.0.0",
+    "vscode-test": "^1.6.1"
+  },
+  "dependencies": {
+    "require-from-string": "^2.0.2",
+    "typescript": "^5.4.5"
+  },
   "contributes": {
     "viewsContainers": {
       "activitybar": [
@@ -108,31 +139,5 @@
       "supported": false,
       "description": "This extension may execute code taken from the workspace."
     }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
-  },
-  "devDependencies": {
-    "@types/glob": "^7.1.3",
-    "@types/mocha": "^8.2.2",
-    "@types/node": "14.x",
-    "@types/sinon": "^10.0.2",
-    "@types/vscode": "^1.59.0",
-    "@typescript-eslint/eslint-plugin": "^4.26.0",
-    "@typescript-eslint/parser": "^4.26.0",
-    "eslint": "^7.27.0",
-    "glob": "^7.1.7",
-    "mocha": "^8.4.0",
-    "sinon": "^11.1.2",
-    "vscode-test": "^1.5.2"
-  },
-  "dependencies": {
-    "require-from-string": "^2.0.2",
-    "typescript": "^4.3.2"
   }
 }

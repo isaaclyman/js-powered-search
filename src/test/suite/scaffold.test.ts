@@ -1,15 +1,13 @@
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as sinon from "sinon";
-
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from "vscode";
+import {afterEach} from 'mocha';
 import { determineFilename } from "../../commands/scaffold";
 
-describe("Scaffold logic", () => {
+suite("Scaffold logic", () => {
   const sandbox = sinon.createSandbox();
 
-  it("chooses a correct initial filename", async () => {
+  test("chooses a correct initial filename", async () => {
     sandbox.stub(vscode.workspace, "findFiles").returns(Promise.resolve([]));
     const filename = await determineFilename(
       vscode.Uri.from({
@@ -21,7 +19,7 @@ describe("Scaffold logic", () => {
     assert.strictEqual(filename, "_SearchDefinition1.jsps.ts");
   });
 
-  it("chooses a correct filename when files already exist", async () => {
+  test("chooses a correct filename when files already exist", async () => {
     sandbox.stub(vscode.workspace, "findFiles").returns(
       Promise.resolve([
         vscode.Uri.from({

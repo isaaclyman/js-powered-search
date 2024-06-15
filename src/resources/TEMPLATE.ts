@@ -49,6 +49,8 @@ export interface SearchOptions {
 export interface LineSearchMetadata {
   fileName: string;
   filePath: string;
+  previousLine: string | null;
+  nextLine: string | null;
 }
 
 export interface LineSearchOptions {

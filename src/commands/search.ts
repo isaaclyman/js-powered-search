@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import * as ts from "typescript";
-import * as requireFromString from "require-from-string";
+import ts from "typescript";
+import requireFromString from "require-from-string";
 import {
   FileSearchOptions,
   LineSearchOptions,
@@ -128,22 +128,25 @@ export async function executeSearch() {
   initializeResultsView();
 
   if (files.length > 1) {
-    const err = await runPreliminaryTest(files.shift()!, searchDefinition, result => {
-      if (!result || result instanceof Error) {
+    const err = await runPreliminaryTest(
+      files.shift()!,
+      searchDefinition,
+      (result) => {
+        if (!result || result instanceof Error) {
+          return result;
+        }
+
+        if (
+          result.matchesByFile ||
+          (result.matchesByLine && Object.keys(result.matchesByLine).length)
+        ) {
+          showResult(result);
+        }
+
         return result;
       }
+    );
 
-      if (
-        result.matchesByFile ||
-        (result.matchesByLine &&
-          Object.keys(result.matchesByLine).length)
-      ) {
-        showResult(result);
-      }
-
-      return result;
-    });
-    
     if (err instanceof Error) {
       console.error(err);
       const message = (err && err.message) || err.toString();
@@ -189,8 +192,7 @@ export async function executeSearch() {
 
           if (
             result.matchesByFile ||
-            (result.matchesByLine &&
-              Object.keys(result.matchesByLine).length)
+            (result.matchesByLine && Object.keys(result.matchesByLine).length)
           ) {
             showResult(result);
           }
@@ -413,7 +415,13 @@ export function testFiles(
             matchesByLine = {} as LineResults;
             for (let lineIx = 0; lineIx < contentLines.length; lineIx++) {
               const line = contentLines[lineIx];
-              if (lineMatcher(line, lineMetadata)) {
+              if (
+                lineMatcher(line, {
+                  ...lineMetadata,
+                  previousLine: lineIx > 0 ? contentLines[lineIx - 1] : null,
+                  nextLine: lineIx < (contentLines.length - 1) ? contentLines[lineIx + 1] : null
+                })
+              ) {
                 matchesByLine[lineIx] = line.trim();
               }
             }
@@ -428,8 +436,8 @@ export function testFiles(
           } as SearchSuccessResult;
         });
       })
-      .then<SearchResult>(
-        resolved => resolved,
+      .then<SearchResult, Error>(
+        (resolved) => resolved,
         (err): Error => {
           console.error(err);
           return err;
