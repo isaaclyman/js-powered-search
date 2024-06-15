@@ -6,11 +6,7 @@ import {
   LineSearchOptions,
   SearchOptions,
 } from "../resources/TEMPLATE";
-import {
-  finalizeResultsView,
-  resetResultsView,
-  showResult,
-} from "./results";
+import { finalizeResultsView, resetResultsView, showResult } from "./results";
 import { performance } from "perf_hooks";
 
 interface SearchDefinitionModule {
@@ -129,22 +125,9 @@ export async function executeSearch() {
 
   if (files.length > 1) {
     const err = await runPreliminaryTest(
-      files.shift()!,
+      files[0],
       searchDefinition,
-      (result) => {
-        if (!result || result instanceof Error) {
-          return result;
-        }
-
-        if (
-          result.matchesByFile ||
-          (result.matchesByLine && Object.keys(result.matchesByLine).length)
-        ) {
-          showResult(result);
-        }
-
-        return result;
-      }
+      (result) => result
     );
 
     if (err instanceof Error) {
@@ -190,11 +173,17 @@ export async function executeSearch() {
             return result;
           }
 
-          if (
-            result.matchesByFile ||
-            (result.matchesByLine && Object.keys(result.matchesByLine).length)
-          ) {
-            showResult(result);
+          if (searchDefinition.settings.onlyShowFilesWithMatchingLines) {
+            if (result.matchesByFile && result.matchesByLine && Object.keys(result.matchesByLine).length) {
+              showResult(result);
+            }
+          } else {
+            if (
+              result.matchesByFile ||
+              (result.matchesByLine && Object.keys(result.matchesByLine).length)
+            ) {
+              showResult(result);
+            }
           }
 
           return result;
@@ -419,7 +408,10 @@ export function testFiles(
                 lineMatcher(line, {
                   ...lineMetadata,
                   previousLine: lineIx > 0 ? contentLines[lineIx - 1] : null,
-                  nextLine: lineIx < (contentLines.length - 1) ? contentLines[lineIx + 1] : null
+                  nextLine:
+                    lineIx < contentLines.length - 1
+                      ? contentLines[lineIx + 1]
+                      : null,
                 })
               ) {
                 matchesByLine[lineIx] = line.trim();

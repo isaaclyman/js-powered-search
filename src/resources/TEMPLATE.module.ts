@@ -5,12 +5,13 @@ export const TEMPLATE = `
 
 export function getSettings(): SearchOptions {
   return {
-    // includeFilePatterns: [],              // globs to include, e.g. ['**/*.ts']. Searches all files by default.
-    // excludeFilePatterns: [],              // globs to exclude.
-    // includeNodeModules: false,            // (default: false) true if node_modules should be searched. Strongly discouraged.
-    // maxFileSizeInKB: 1000,                // (default: 1000) any files larger than this will be skipped.
-    // onlyTestLinesInMatchingFiles: false,  // (default: false) true if searchByLine should only be used on files that pass searchByFile
-    // matchTestingTimeoutInSeconds: 5       // (default: 5) search is tested on a single file preliminarily. If your matchers takes longer than this, an error will appear.
+    // includeFilePatterns: [],               // globs to include, e.g. ['**/*.ts']. Searches all files by default.
+    // excludeFilePatterns: [],               // globs to exclude.
+    // includeNodeModules: false,             // (default: false) true if node_modules should be searched. Strongly discouraged.
+    // maxFileSizeInKB: 1000,                 // (default: 1000) any files larger than this will be skipped.
+    // onlyTestLinesInMatchingFiles: false,   // (default: false) true if searchByLine should only be used on files that pass searchByFile
+    // onlyShowFilesWithMatchingLines: false, // (default: false) true if you're using file AND line matchers and only want to show files with matching lines
+    // matchTestingTimeoutInSeconds: 5        // (default: 5) search is tested on a single file preliminarily. If your matchers takes longer than this, an error will appear.
   };
 }
 
@@ -44,6 +45,7 @@ export interface SearchOptions {
   includeNodeModules?: boolean;
   maxFileSizeInKB?: number;
   onlyTestLinesInMatchingFiles?: boolean;
+  onlyShowFilesWithMatchingLines?: boolean;
   matchTestingTimeoutInSeconds?: number;
 }
 
