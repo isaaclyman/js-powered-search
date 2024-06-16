@@ -1,0 +1,1 @@
+[JS Powered Search](https://github.com/isaaclyman/js-powered-search) © 2021 by [Isaac Lyman](https://isaaclyman.com) is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1).
