@@ -48,3 +48,7 @@ Upgrade packages and extension tooling; add `onlyShowFilesWithMatchingLines` opt
 ## [1.1.1] - 2024-06-16
 
 Update README with new Ko-fi sponsorship link.
+
+## [1.1.2] - 2024-06-16
+
+License extension under CC-BY-SA 4.0.
