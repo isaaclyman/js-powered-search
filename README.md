@@ -8,7 +8,7 @@ JSPS scaffolds a self-contained search definition file which you can alter by wr
 
 Contribute here: https://github.com/isaaclyman/js-powered-search
 
-Buy me a Coke: https://paypal.me/isaaclyman
+Buy me a Coke: https://ko-fi.com/isaaclyman
 
 ## Features
 
